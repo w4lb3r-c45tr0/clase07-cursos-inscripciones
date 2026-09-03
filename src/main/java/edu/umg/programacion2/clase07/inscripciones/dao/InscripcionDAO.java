@@ -111,38 +111,58 @@ public class InscripcionDAO {
      */
     public List<Estudiante> listarEstudiantesDeCurso(String nombreCurso) throws SQLException {
         List<Estudiante> resultado = new ArrayList<>();
-        // TODO: completar.
+        String sql = "SELECT e.id, e.nombre, e.carnet "
+                   + "FROM inscripciones i "
+                   + "JOIN estudiantes e ON i.estudiante_id = e.id "
+                   + "JOIN cursos c ON i.curso_id = c.id "
+                   + "WHERE c.nombre = ?";
 
+        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+             PreparedStatement statement = conexion.prepareStatement(sql)) {
+
+            statement.setString(1, nombreCurso);
+
+            try (ResultSet resultadoSql = statement.executeQuery()) {
+                while (resultadoSql.next()) {
+                    resultado.add(mapearEstudiante(resultadoSql));
+                }
+            }
+        }
         return resultado;
     }
 
-    /**
-     * Calcula el promedio de notas de un estudiante (solo cursos que YA
-     * tienen nota registrada).
-     *
-     * Ejemplo: promedioDeEstudiante("2024001") (Ana Lopez, notas 90.00 y
-     * 85.00) devuelve Optional.of(87.5).
-     *
-     * Pistas:
-     * 1. Esto es un caso nuevo: en vez de traer las filas y promediar en
-     *    Java con una lista, se lo pides a MySQL con una funcion de
-     *    AGREGACION:
-     *      SELECT AVG(i.nota) AS promedio
-     *      FROM inscripciones i
-     *      JOIN estudiantes e ON i.estudiante_id = e.id
-     *      WHERE e.carnet = ?
-     * 2. IMPORTANTE: AVG() ignora automaticamente las filas con nota NULL -
-     *    no necesitas filtrarlas a mano.
-     * 3. Si el estudiante no tiene NINGUNA nota registrada, AVG devuelve
-     *    NULL. Revisa eso con resultado.getObject("promedio") == null (o
-     *    resultado.wasNull() despues de getDouble) antes de retornar
-     *    Optional.empty().
-     */
     public Optional<Double> promedioDeEstudiante(String carnet) throws SQLException {
-        // TODO: completar (ver pistas arriba, especialmente el caso NULL).
-        return Optional.empty();
+        String sql = "SELECT AVG(i.nota) AS promedio "
+                   + "FROM inscripciones i "
+                   + "JOIN estudiantes e ON i.estudiante_id = e.id "
+                   + "WHERE e.carnet = ?";
+
+        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+             PreparedStatement statement = conexion.prepareStatement(sql)) {
+
+            statement.setString(1, carnet);
+
+            try (ResultSet resultado = statement.executeQuery()) {
+                if (resultado.next()) {
+                    double promedio = resultado.getDouble("promedio");
+                    if (resultado.wasNull()) {
+                        return Optional.empty();
+                    }
+                    return Optional.of(promedio);
+                }
+                return Optional.empty();
+            }
+        }
     }
 
+    private Estudiante mapearEstudiante(ResultSet resultado) throws SQLException {
+        int id = resultado.getInt("id");
+        String nombre = resultado.getString("nombre");
+        String carnet = resultado.getString("carnet");
+        return new Estudiante(id, nombre, carnet);
+    }
+
+   
     /**
      * Encuentra el nombre del curso con mas estudiantes inscritos.
      *
