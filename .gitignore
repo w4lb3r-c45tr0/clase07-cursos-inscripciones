@@ -1,2 +1,26 @@
-target/
+# Archivos de configuración local y credenciales
 database.properties
+
+# Archivos de construcción Maven (Archivos compilados)
+target/
+*.jar
+*.war
+*.ear
+
+# Archivos de entorno e IDE Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+bin/
+
+# Configuración de IntelliJ / NetBeans (Por si tus compañeros usan otro IDE)
+.idea/
+*.iml
+*.iws
+*.ipr
+*.nbconst
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
