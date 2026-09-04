@@ -4,11 +4,11 @@ import edu.umg.programacion2.clase07.inscripciones.modelo.Curso;
 import edu.umg.programacion2.clase07.inscripciones.modelo.Estudiante;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +27,6 @@ import java.util.Optional;
  */
 public class InscripcionDAO {
 
-    private static final String URL = "jdbc:mariadb://localhost:3306/prog2_db";
-    private static final String USUARIO = "root";
-    private static final String PASSWORD = "MyfirstBD.W";
 
     /**
      * Inscribe a un estudiante en un curso. Retorna el id generado.
@@ -168,5 +165,32 @@ public class InscripcionDAO {
     public Optional<String> cursoConMasInscritos() throws SQLException {
         // TODO: completar (ver pistas arriba).
         return Optional.empty();
+    }
+    
+    /**
+     * DESAFÍO OPCIONAL:
+     * Lista los estudiantes que tienen al menos una inscripción con nota NULL.
+     * Utiliza DISTINCT para evitar que un estudiante aparezca duplicado si
+     * tiene más de un curso sin nota.
+     */
+    public List<Estudiante> estudiantesSinNota() throws SQLException {
+        List<Estudiante> resultado = new ArrayList<>();
+        String sql = "SELECT DISTINCT e.id, e.nombre, e.carnet " +
+                     "FROM inscripciones i " +
+                     "JOIN estudiantes e ON i.estudiante_id = e.id " +
+                     "WHERE i.nota IS NULL";
+
+        try (Connection conexion = ConexionDB.obtenerConexion();
+             PreparedStatement statement = conexion.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                String carnet = rs.getString("carnet");
+                resultado.add(new Estudiante(id, nombre, carnet));
+            }
+        }
+        return resultado;
     }
 }

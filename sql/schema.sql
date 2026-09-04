@@ -50,3 +50,61 @@ INSERT IGNORE INTO inscripciones (id, estudiante_id, curso_id, nota) VALUES
     (4, 3, 1, 95.00),
     (5, 3, 3, NULL),
     (6, 4, 2, NULL);
+    
+ -- EstudianteDAO.java   
+-- Listar todos los estudiantes. 
+SELECT id, nombre, carnet FROM estudiantes;
+
+-- Buscar estudiante por ID
+SELECT id, nombre, carnet FROM estudiantes WHERE id = ?;
+
+-- Crear nuevo estudiante
+INSERT INTO estudiantes (nombre, carnet) VALUES (?, ?);
+
+ -- CursoDAO.java
+-- Listar todos los cursos
+SELECT id, codigo, nombre, creditos FROM cursos;
+
+-- Buscar curso por ID
+SELECT id, nombre, creditos FROM cursos WHERE id = ?;
+
+ -- InscripcionDAO.java
+-- Inscribir estudiante en un curso
+INSERT INTO inscripciones (estudiante_id, curso_id) VALUES (?, ?);
+
+-- Asignar / actualizar nota
+UPDATE inscripciones SET nota = ? WHERE estudiante_id = ? AND curso_id = ?;
+
+-- Ver historial académico de un estudiante (Cursos + Nota)
+SELECT c.id, c.nombre, c.creditos
+FROM inscripciones i
+JOIN cursos c ON i.curso_id = c.id
+JOIN estudiantes e ON i.estudiante_id = e.id
+WHERE e.carnet = ?;
+
+-- Listar estudiantes por curso
+SELECT e.id, e.nombre, e.carnet
+FROM inscripciones i
+JOIN estudiantes e ON i.estudiante_id = e.id
+JOIN cursos c ON i.curso_id = c.id
+WHERE c.nombre = ?;
+
+-- Calcular promedio general de un estudiante
+SELECT AVG(i.nota) AS promedio
+FROM inscripciones i
+JOIN estudiantes e ON i.estudiante_id = e.id
+WHERE e.carnet = ?;
+
+-- Curso con más inscritos
+SELECT c.nombre, COUNT(*) AS total
+FROM inscripciones i
+JOIN cursos c ON i.curso_id = c.id
+GROUP BY c.nombre
+ORDER BY total DESC
+LIMIT 1;
+
+-- Estudiantes sin nota registrada (Desafío Opcional)
+SELECT DISTINCT e.id, e.nombre, e.carnet 
+FROM estudiantes e 
+JOIN inscripciones i ON e.id = i.estudiante_id 
+WHERE i.nota IS NULL;    

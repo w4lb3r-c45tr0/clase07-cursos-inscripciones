@@ -3,7 +3,6 @@ package edu.umg.programacion2.clase07.inscripciones.dao;
 import edu.umg.programacion2.clase07.inscripciones.modelo.Curso;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,8 +16,6 @@ import java.util.Optional;
  * Tampoco es el foco de la tarea.
  */
 public class CursoDAO {
-
-   
 
     public int crear(Curso curso) throws SQLException {
         String sql = "INSERT INTO cursos (nombre, creditos) VALUES (?, ?)";

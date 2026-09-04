@@ -3,7 +3,6 @@ package edu.umg.programacion2.clase07.inscripciones.dao;
 import edu.umg.programacion2.clase07.inscripciones.modelo.Estudiante;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,14 +18,10 @@ import java.util.Optional;
  */
 public class EstudianteDAO {
 
-    private static final String URL = "jdbc:mariadb://localhost:3306/prog2_db";
-    private static final String USUARIO = "root";
-    private static final String PASSWORD = "MyfirstBD.W";
-
     public int crear(Estudiante estudiante) throws SQLException {
         String sql = "INSERT INTO estudiantes (nombre, carnet) VALUES (?, ?)";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+        try (Connection conexion = ConexionDB.obtenerConexion();
              PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, estudiante.getNombre());
@@ -46,7 +41,7 @@ public class EstudianteDAO {
         String sql = "SELECT id, nombre, carnet FROM estudiantes ORDER BY id";
         List<Estudiante> estudiantes = new ArrayList<>();
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+        try (Connection conexion = ConexionDB.obtenerConexion();
              PreparedStatement statement = conexion.prepareStatement(sql);
              ResultSet resultado = statement.executeQuery()) {
 
@@ -60,7 +55,7 @@ public class EstudianteDAO {
     public Optional<Estudiante> buscarPorCarnet(String carnet) throws SQLException {
         String sql = "SELECT id, nombre, carnet FROM estudiantes WHERE carnet = ?";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+        try (Connection conexion = ConexionDB.obtenerConexion();
              PreparedStatement statement = conexion.prepareStatement(sql)) {
 
             statement.setString(1, carnet);
