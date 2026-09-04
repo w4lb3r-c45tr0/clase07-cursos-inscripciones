@@ -49,10 +49,23 @@ public class InscripcionDAO {
      *    vez de dejar que el error se propague sin explicacion.
      */
     public int inscribir(int estudianteId, int cursoId) throws SQLException {
-        // TODO: completar (ver pistas arriba). Recuerda el catch especifico
-        // para inscripciones duplicadas antes del catch general.
-        return -1;
-    }
+        String sql = "INSERT INTO inscripciones (estudiante_id, curso_id) VALUES (?, ?)";
+
+        try (Connection conexion = ConexionDB.obtenerConexion();
+                PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+               statement.setInt(1, estudianteId);
+               statement.setInt(2, cursoId);
+               statement.executeUpdate();
+
+               try (ResultSet claves = statement.getGeneratedKeys()) {
+                   if (claves.next()) {
+                       return claves.getInt(1);
+                   }
+                   return -1;
+               }
+           }
+       }
 
     /**
      * Registra (o actualiza) la nota de un estudiante en un curso.
@@ -68,8 +81,23 @@ public class InscripcionDAO {
      *    EstudianteDAO.actualizarNombre en la Clase 5).
      */
     public boolean registrarNota(int estudianteId, int cursoId, double nota) throws SQLException {
-        // TODO: completar.
-        return false;
+        String sql = "UPDATE inscripciones SET nota = ? WHERE estudiante_id = ? AND curso_id = ?";
+
+        
+        try (Connection conexion = ConexionDB.obtenerConexion();
+             PreparedStatement statement = conexion.prepareStatement(sql)) {
+
+           
+            statement.setDouble(1, nota);        
+            statement.setInt(2, estudianteId);   
+            statement.setInt(3, cursoId);       
+
+       
+            int filasAfectadas = statement.executeUpdate();
+
+            
+            return filasAfectadas > 0;
+        }
     }
 
     /**
@@ -92,7 +120,37 @@ public class InscripcionDAO {
      */
     public List<Curso> listarCursosDeEstudiante(String carnet) throws SQLException {
         List<Curso> resultado = new ArrayList<>();
-        // TODO: completar (ver pista del JOIN de 3 tablas arriba).
+        
+        String sql = "SELECT c.id, c.nombre, c.creditos " +
+                "FROM inscripciones i " +
+                "JOIN cursos c ON i.curso_id = c.id " +
+                "JOIN estudiantes e ON i.estudiante_id = e.id " +
+                "WHERE e.carnet = ?";
+        
+        try (Connection conexion = ConexionDB.obtenerConexion();
+        		PreparedStatement statement = conexion.prepareStatement(sql)) {
+        	
+        	statement.setString(1, carnet);
+        	
+        	try (ResultSet rs = statement.executeQuery()) {
+        		
+        		while (rs.next()) {
+        			
+        			int id = rs.getInt("id");
+        			String nombre = rs.getString("nombre");
+        			int creditos = rs.getInt("creditos");
+        			
+        			Curso curso = new Curso(id, nombre, creditos);
+        			
+        			
+        			resultado.add(curso);
+        			
+        		}
+        		
+        	}
+        			
+        		}
+        				
 
         return resultado;
     }
