@@ -4,7 +4,6 @@ import edu.umg.programacion2.clase07.inscripciones.modelo.Curso;
 import edu.umg.programacion2.clase07.inscripciones.modelo.Estudiante;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,10 +25,6 @@ import java.util.Optional;
  * cambia es la consulta SQL.
  */
 public class InscripcionDAO {
-
-    private static final String URL = "jdbc:mariadb://localhost:3306/prog2_db";
-    private static final String USUARIO = "root";
-    private static final String PASSWORD = "MyfirstBD.W";
 
     /**
      * Inscribe a un estudiante en un curso. Retorna el id generado.
@@ -117,7 +112,7 @@ public class InscripcionDAO {
                    + "JOIN cursos c ON i.curso_id = c.id "
                    + "WHERE c.nombre = ?";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+        try (Connection conexion = ConexionDB.obtenerConexion();
              PreparedStatement statement = conexion.prepareStatement(sql)) {
 
             statement.setString(1, nombreCurso);
@@ -137,7 +132,7 @@ public class InscripcionDAO {
                    + "JOIN estudiantes e ON i.estudiante_id = e.id "
                    + "WHERE e.carnet = ?";
 
-        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+        try (Connection conexion = ConexionDB.obtenerConexion();
              PreparedStatement statement = conexion.prepareStatement(sql)) {
 
             statement.setString(1, carnet);
