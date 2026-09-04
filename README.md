@@ -11,6 +11,23 @@ Leonardo Sebastián Solórzano Chavarría   0905-25-11670
 Jery Alexander Barrientos Peraza         0905-15-9622
 
 
+## 🛠️ Configuración de Seguridad y Base de Datos Local
+
+Las credenciales de acceso a la base de datos se manejan de forma segura a través de archivos `.properties` y no se suben al repositorio.
+
+### Pasos para configurar tu entorno local:
+
+1. Ve a la carpeta `src/main/resources/`.
+2. Haz una copia del archivo `database.properties.example` y renómbralo como `database.properties`.
+3. Abre el nuevo archivo `database.properties` y coloca la contraseña local de tu servidor MariaDB/MySQL:
+   ```properties
+   db.url=jdbc:mariadb://localhost:3306/prog2_db
+   db.usuario=root
+   db.password=TU_CONTRASEÑA_LOCAL
+   
+Guarda los cambios. El archivo database.properties está ignorado por .gitignore, por lo que 
+tus contraseñas locales se mantendrán seguras.   
+   
 ## Enunciado
 
 Un estudiante puede inscribirse en varios cursos, y un curso puede tener
