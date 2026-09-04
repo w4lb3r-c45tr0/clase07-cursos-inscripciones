@@ -47,24 +47,27 @@ public class InscripcionDAO {
      *    ANTES del catch de SQLException general). Atrapala y retorna -1 en
      *    vez de dejar que el error se propague sin explicacion.
      */
-    public int inscribir(int estudianteId, int cursoId) throws SQLException {
+	public int inscribir(int estudianteId, int cursoId) throws SQLException {
         String sql = "INSERT INTO inscripciones (estudiante_id, curso_id) VALUES (?, ?)";
 
-        try (Connection conexion = ConexionDB.obtenerConexion();
-                PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = ConexionDB.obtenerConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-               statement.setInt(1, estudianteId);
-               statement.setInt(2, cursoId);
-               statement.executeUpdate();
+            stmt.setInt(1, estudianteId);
+            stmt.setInt(2, cursoId);
+            stmt.executeUpdate();
 
-               try (ResultSet claves = statement.getGeneratedKeys()) {
-                   if (claves.next()) {
-                       return claves.getInt(1);
-                   }
-                   return -1;
-               }
-           }
-       }
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            return -1;
+        }
+
+        return -1;
+    }
 
     /**
      * Registra (o actualiza) la nota de un estudiante en un curso.
